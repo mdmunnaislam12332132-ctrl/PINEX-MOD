@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PINEX MOD VIP</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; overflow: hidden; margin: 0; }
+        
+        /* গেম ফ্রেম */
+        #game-frame { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 1; }
+        
+        /* ড্র্যাগেবল বক্স স্টাইল */
+        .draggable { position: absolute; z-index: 9999; cursor: move; user-select: none; }
+        
+        #signal-box {
+            top: 60px; left: 20px; width: 260px;
+            background: rgba(0, 15, 0, 0.95);
+            border: 2px solid #00ff00;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+            font-size: 13px;
+            display: none;
+        }
+        
+        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #00ff00; padding-bottom: 5px; margin-bottom: 10px; font-weight: bold; }
+        
+        .result-box { text-align: center; margin: 10px 0; padding: 10px; border: 1px dashed #004400; background: #001100; }
+        
+        .big { color: #ffff00; font-weight: 900; font-size: 28px; text-shadow: 0 0 10px #ffff00; display: block; }
+        .small { color: #00ffff; font-weight: 900; font-size: 28px; text-shadow: 0 0 10px #00ffff; display: block; }
+        .skip { color: #ff0000; font-weight: bold; font-size: 20px; animation: blink 1s infinite; display: block; }
+        
+        @keyframes blink { 50% { opacity: 0; } }
+        
+        .info-row { display: flex; justify-content: space-between; margin-top: 5px; font-size: 11px; color: #aaa; }
+        
+        .win { color: #0f0; font-weight: bold; }
+        .loss { color: #f00; font-weight: bold; }
+        .super-win { color: #ff00ff; font-weight: bold; text-shadow: 0 0 5px #ff00ff; }
+        
+        /* স্কাল বাটন */
+        #skull-btn {
+            top: 10px; left: 10px; width: 50px; height: 50px;
+            background: #000; border: 2px solid #0f0;
+            border-radius: 50%; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 24px; cursor: pointer; box-shadow: 0 0 15px #0f0;
+            z-index: 10000;
+        }
+
+        #pattern-display { font-size: 10px; letter-spacing: 2px; text-align: center; color: #008800; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <iframe src="https://tkclub2.com" id="game-frame"></iframe>
+
+    <div id="skull-btn" class="draggable" onclick="toggleBox()">💀</div>
+
+    <div id="signal-box" class="draggable">
+        <div class="header">
+            <span>PINEX MOD VIP</span>
+            <span style="color:#ff0000;">● LIVE</span>
+        </div>
+        
+        <div class="info-row">
+            <span>Period: <b id="next-period" style="color:#fff;">Wait...</b></span>
+            <span>Timer: <b id="timer">--</b></span>
+        </div>
+
+        <div class="result-box">
+            <span id="signal-text" style="color:gray;">ANALYZING DB...</span>
+        </div>
+
+        <div class="info-row">
+            <span>Status: <span id="win-loss-stat">Start</span></span>
+            <span>Accuracy: <span id="accuracy-stat">0%</span></span>
+        </div>
+        
+        <div style="margin-top: 10px; border-top: 1px solid #333; padding-top: 5px;">
+            <div style="font-size: 10px; color: #fff;">MATCHED PATTERN (Source: DB):</div>
+            <div id="pattern-display">Waiting for data...</div>
+            <div id="match-count" style="font-size: 10px; text-align: right; color: #aaa;">Matches: 0</div>
+        </div>
+    </div>
+
+    <script>
+        // কনফিগারেশন
+        const DB_URL = "https://ck-win-36ca8-default-rtdb.firebaseio.com/wingo_records.json";
+        
+        // ভেরিয়েবল
+        let lastPeriod = null;
+        let lastPrediction = null; // BIG or SMALL
+        let winCount = 0;
+        let lossCount = 0;
+        let isProcessing = false;
+
+        // UI ড্র্যাগ ফাংশন
+        function makeDraggable(el) {
+            let isDown = false, offX, offY;
+            const start = (x, y) => { isDown=true; offX=x-el.offsetLeft; offY=y-el.offsetTop; };
+            const move = (x, y) => { if(isDown) { el.style.left=(x-offX)+'px'; el.style.top=(y-offY)+'px'; }};
+            const end = () => isDown=false;
+            
+            el.addEventListener('mousedown', e => start(e.clientX, e.clientY));
+            document.addEventListener('mousemove', e => move(e.clientX, e.clientY));
+            document.addEventListener('mouseup', end);
+            
+            el.addEventListener('touchstart', e => start(e.touches[0].clientX, e.touches[0].clientY));
+            document.addEventListener('touchmove', e => move(e.touches[0].clientX, e.touches[0].clientY));
+            document.addEventListener('touchend', end);
+        }
+        makeDraggable(document.getElementById('signal-box'));
+        makeDraggable(document.getElementById('skull-btn'));
+
+        function toggleBox() {
+            let box = document.getElementById('signal-box');
+            box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // মেইন লজিক ফাংশন
+        async function runAnalysis() {
+            if(isProcessing) return;
+            isProcessing = true;
+
+            try {
+                let res = await fetch(DB_URL);
+                let data = await res.json();
+                if(!data) { isProcessing = false; return; }
+
+                // ডাটা প্রসেসিং
+                let records = Object.values(data).sort((a,b) => a.period - b.period);
+                let latest = records[records.length - 1];
+                let currentPeriod = latest.period;
+
+                // পিরিয়ড চেঞ্জ ডিটেকশন
+                if (currentPeriod !== lastPeriod) {
+                    
+                    // ১. আগের প্রেডিকশন চেক (Win/Loss)
+                    if (lastPrediction && lastPeriod) {
+                        let actualResult = latest.size; // BIG/SMALL
+                        if (actualResult === lastPrediction) {
+                            winCount++;
+                            lossCount = 0; // Win হলে লস রিসেট
+                        } else {
+                            lossCount++;
+                            winCount = 0; // Loss হলে উইন রিসেট
+                        }
+                        updateStats();
+                    }
+
+                    // ২. নতুন পিরিয়ড সেট
+                    document.getElementById('next-period').innerText = (BigInt(currentPeriod) + 1n).toString();
+                    document.getElementById('signal-text').innerHTML = '<span class="blink" style="color:white;">SCANNING...</span>';
+                    
+                    // ৩. এলগরিদম রান করা
+                    let prediction = calculatePrediction(records);
+                    
+                    // ৪. রেজাল্ট দেখানো
+                    displaySignal(prediction);
+                    
+                    lastPeriod = currentPeriod;
+                }
+
+            } catch(e) { console.error("API Error", e); }
+            isProcessing = false;
+        }
+
+        // 🧠 এডভান্সড এলগরিদম (৩০ ঘন্টা + ৮-৫ প্যাটার্ন)
+        function calculatePrediction(records) {
+            const NOW = Math.floor(Date.now() / 1000);
+            const HOUR_30 = 30 * 3600; 
+
+            // ডাটা ভাগ করা (Recent vs Old)
+            let recentData = []; // last 30 hours
+            let oldData = [];    // older than 30 hours
+            
+            records.forEach(r => {
+                if ((NOW - r.timestamp) <= HOUR_30) recentData.push(r);
+                else oldData.push(r);
+            });
+
+            // প্যাটার্ন ম্যাচিং (8 থেকে 5 পর্যন্ত চেক করবে)
+            let foundPred = null;
+            let bestMatchCount = 0;
+            let usedPattern = "";
+
+            // লস যদি ৩ এর বেশি হয়, তাহলে ১০ ঘর পর্যন্ত দেখবে (আরো গভীর এনালাইসিস)
+            let maxDepth = lossCount >= 3 ? 10 : 8; 
+
+            for (let depth = maxDepth; depth >= 5; depth--) {
+                // বর্তমান প্যাটার্ন বের করা (যেমন: S B S B B)
+                let currentPattern = records.slice(-depth).map(r => r.size[0]); // ['S', 'B', ...]
+                
+                // ডাটাবেস স্ক্যানিং ভেরিয়েবল
+                let bigScore = 0;
+                let smallScore = 0;
+                let matches = 0;
+
+                // স্ক্যান ফাংশন
+                const scan = (dataset, weight) => {
+                    for(let i = 0; i < dataset.length - depth - 1; i++) {
+                        let slice = dataset.slice(i, i+depth).map(r => r.size[0]);
+                        // প্যাটার্ন মিললে
+                        if (JSON.stringify(slice) === JSON.stringify(currentPattern)) {
+                            let nextVal = dataset[i+depth].size; // এর পরে কি এসেছিল?
+                            if(nextVal === "BIG") bigScore += (1 * weight);
+                            if(nextVal === "SMALL") smallScore += (1 * weight);
+                            matches++;
+                        }
+                    }
+                };
+
+                // পুরানো ডাটা (Weight 1)
+                scan(oldData, 1);
+                // নতুন ডাটা (Weight 2 - কারণ এটা বেশি গুরুত্বপূর্ণ)
+                scan(recentData, 2);
+
+                // যদি ম্যাচ পাওয়া যায় এবং সিগন্যাল স্ট্রং হয়
+                if (matches > 0 && Math.abs(bigScore - smallScore) > 1) {
+                    foundPred = bigScore > smallScore ? "BIG" : "SMALL";
+                    bestMatchCount = matches;
+                    usedPattern = currentPattern.join(" ");
+                    
+                    // রিয়েল টাইম একুরেসি ক্যালকুলেশন
+                    let total = bigScore + smallScore;
+                    let conf = Math.round((Math.max(bigScore, smallScore) / total) * 100);
+                    document.getElementById('accuracy-stat').innerText = conf + "%";
+                    
+                    break; // বেস্ট ম্যাচ পাওয়া গেছে, লুপ থামাও
+                }
+            }
+
+            // প্যাটার্ন UI আপডেট
+            document.getElementById('pattern-display').innerText = usedPattern || "No clear pattern";
+            document.getElementById('match-count').innerText = "DB Matches: " + bestMatchCount;
+
+            return foundPred;
+        }
+
+        function displaySignal(pred) {
+            let el = document.getElementById('signal-text');
+            if (pred) {
+                lastPrediction = pred;
+                el.className = pred === "BIG" ? "big" : "small";
+                el.innerText = pred;
+            } else {
+                lastPrediction = null;
+                el.className = "skip";
+                el.innerText = "SKIP (RISKY)";
+            }
+        }
+
+        function updateStats() {
+            let el = document.getElementById('win-loss-stat');
+            if (winCount > 0) {
+                if (winCount > 3) {
+                    el.className = "super-win";
+                    el.innerText = "🔥 SUPER WIN " + winCount;
+                } else {
+                    el.className = "win";
+                    el.innerText = "WIN " + winCount;
+                }
+            } else if (lossCount > 0) {
+                el.className = "loss";
+                el.innerText = "LOSS " + lossCount;
+            } else {
+                el.innerText = "Analysing...";
+            }
+        }
+
+        // টাইমার (শুধু ভিজ্যুয়াল)
+        setInterval(() => {
+            let d = new Date();
+            let s = 60 - d.getSeconds();
+            document.getElementById('timer').innerText = s + "s";
+        }, 1000);
+
+        // ২.৫ সেকেন্ড পর পর ডাটা চেক
+        setInterval(runAnalysis, 2500);
+
+    </script>
+</body>
+</html>
