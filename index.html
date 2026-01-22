@@ -3,157 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PINEX MINI MOD</title>
+    <title>PINEX VIP MOD | PROFESSIONAL</title>
     <style>
         * { -webkit-tap-highlight-color: transparent; user-select: none; box-sizing: border-box; }
-        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; font-family: monospace; }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; font-family: 'Arial Black', sans-serif; }
+        
         #game-frame { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 1; }
         .draggable { position: absolute; z-index: 10000; touch-action: none; cursor: move; }
 
         /* SKULL BUTTON */
         #main-skull {
-            top: 20%; left: 10px; width: 45px; height: 45px;
-            background: #000; border: 2px solid #0f0; border-radius: 50%;
+            top: 15%; left: 10px; width: 55px; height: 55px;
+            background: #111; border: 2.5px solid #0f0; border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 0 10px #0f0; cursor: pointer; font-size: 20px;
+            box-shadow: 0 0 15px #0f0; cursor: pointer; font-size: 28px;
         }
 
-        /* SMALL SIGNAL WIDGET */
+        /* WIDGET DESIGN */
         #signal-widget {
-            top: 20%; right: 10px; width: 170px; /* একদম ছোট করা হয়েছে */
-            background: rgba(0,0,0,0.9); border: 1.5px solid #00ffff;
-            border-radius: 8px; color: white; text-align: center; overflow: hidden;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            top: 15%; right: 10px; width: 240px; 
+            background: rgba(0, 0, 0, 0.95); border: 2px solid #333;
+            border-radius: 20px; color: white; text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.9); backdrop-filter: blur(15px);
+            overflow: hidden;
         }
 
-        .header { background: #00ffff22; padding: 4px; font-size: 10px; border-bottom: 1px solid #00ffff; font-weight: bold; color: #00ffff; }
-        .pattern-box { font-size: 8px; color: #ff00de; margin: 2px; }
-        .pred-area { height: 60px; display: flex; align-items: center; justify-content: center; }
-        .res-txt { font-size: 32px; font-weight: 900; }
-        .big { color: #ffff00; text-shadow: 0 0 10px #ffff00; }
-        .small { color: #00ffff; text-shadow: 0 0 10px #00ffff; }
-        .skip { color: #ff0000; font-size: 24px; animation: blink 0.5s infinite; }
+        .header-name { 
+            background: linear-gradient(180deg, #1a1a1a, #000);
+            padding: 10px; font-size: 18px; font-weight: 900; 
+            color: #0f0; letter-spacing: 1px; border-bottom: 2px solid #222;
+            text-shadow: 0 0 10px #0f0;
+        }
         
-        .status-area { font-size: 10px; padding: 3px; border-top: 1px solid #333; }
-        .info-row { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; padding: 5px; font-size: 9px; background: #111; }
-        .full-period { font-size: 9px; color: #0f0; margin-bottom: 2px; }
-        @keyframes blink { 50% { opacity: 0.3; } }
+        .signal-container { 
+            position: relative; height: 135px; 
+            display: flex; flex-direction: column; 
+            align-items: center; justify-content: center;
+        }
+        
+        .mega-txt { 
+            font-size: 65px; font-weight: 900; line-height: 1; 
+            text-transform: uppercase; margin-bottom: 8px;
+            display: none; width: 100%;
+        }
+
+        .period-display {
+            font-size: 12px; color: #00ffff; font-family: monospace;
+            background: rgba(255,255,255,0.1); padding: 3px 12px;
+            border-radius: 50px; font-weight: bold;
+        }
+        
+        /* LOADING SPINNER */
+        #loading-anim { 
+            width: 60px; height: 60px; 
+            border: 6px solid rgba(255, 255, 255, 0.1); 
+            border-top: 6px solid #0f0; 
+            border-radius: 50%; 
+            display: block; 
+            animation: spin-pro 0.8s linear infinite; 
+            margin-bottom: 10px;
+        }
+
+        .info-panel { 
+            display: flex; justify-content: space-between; 
+            background: #0a0a0a; padding: 10px 15px; 
+            border-top: 1px solid #333;
+        }
+        #timer-sec { color: #ff0; font-weight: bold; font-size: 16px; }
+        #clock-bd { color: #888; font-size: 13px; font-family: monospace; }
+
+        @keyframes spin-pro { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
     <iframe src="https://hgzy.in/#/register?invitationCode=51226515900" id="game-frame"></iframe>
-    <div id="main-skull" class="draggable" onclick="toggleW()">💀</div>
+
+    <div id="main-skull" class="draggable" onclick="toggleWidget()">💀</div>
 
     <div id="signal-widget" class="draggable">
-        <div class="header">PINEX MINI MOD</div>
-        <div id="pat-trace" class="pattern-box">SCANNING WAIT...</div>
+        <div class="header-name">PINEX VIP MOD</div>
         
-        <div class="pred-area">
-            <div id="signal-res" class="res-txt" style="color:#555; font-size: 14px;">WAIT...</div>
+        <div class="signal-container">
+            <div id="loading-anim"></div>
+            <div id="signal-res" class="mega-txt" style="color:#0f0;">READY</div>
+            <div id="period-num" class="period-display">ANALYZING...</div>
         </div>
 
-        <div id="streak-box" class="status-area">READY</div>
-
-        <div class="info-row">
-            <div>NEXT:<br><span id="next-p" style="color:#fff">-</span></div>
-            <div>MATCH:<br><span id="match-count" style="color:#ff00de">0</span></div>
+        <div class="info-panel">
+            <div id="clock-bd">00:00:00</div>
+            <div>NEXT- <span id="timer-sec">60</span>s</div>
         </div>
-        <div class="full-period">FULL P: <span id="full-p">---</span></div>
     </div>
 
     <script>
-        const DB = "https://hidndnd-default-rtdb.firebaseio.com/wingo_records.json";
-        let lastP = null, pred = null, streak = 0;
+        const API_URL = "https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json";
+        let lastId = null;
 
-        async function loop() {
-            try {
-                let r = await fetch(DB);
-                let data = await r.json();
-                if(!data) return;
-
-                let keys = Object.keys(data).sort();
-                let lastData = data[keys[keys.length-1]];
-                let curP = lastData.period;
-
-                if(curP !== lastP) {
-                    // Win/Loss check
-                    if(lastP && pred && pred !== "SKIP") {
-                        if(lastData.size === pred) {
-                            streak = (streak < 0) ? 1 : streak + 1;
-                        } else {
-                            streak = (streak > 0) ? -1 : streak - 1;
-                        }
-                        updateUI(streak);
-                    }
-
-                    lastP = curP;
-                    document.getElementById('full-p').innerText = (BigInt(curP)+1n).toString();
-                    document.getElementById('next-p').innerText = (BigInt(curP)+1n).toString().slice(-4);
-
-                    // 6-Pattern Analysis
-                    let analysis = analyze(data, keys);
-                    pred = analysis.prediction;
-                    showSignal(analysis);
-                }
-            } catch(e) {}
+        function toggleWidget() {
+            let w = document.getElementById('signal-widget');
+            w.style.display = (w.style.display === 'none') ? 'block' : 'none';
         }
 
-        function analyze(data, keys) {
-            let history = keys.map(k => data[k].size);
-            if(history.length < 15) return { prediction: "SKIP", matches: 0 };
-
-            let currentPattern = history.slice(-6); // ৬ টা প্যাটার্ন
-            document.getElementById('pat-trace').innerText = "PAT: " + currentPattern.map(s=>s[0]).join("");
-
-            let bMatch = 0, sMatch = 0, totalMatch = 0;
-
-            for(let i=0; i < history.length - 7; i++) {
-                if(JSON.stringify(history.slice(i, i+6)) === JSON.stringify(currentPattern)) {
-                    totalMatch++;
-                    if(history[i+6] === "BIG") bMatch++; else sMatch++;
-                }
-            }
-
-            if(totalMatch === 0) return { prediction: "SKIP", matches: 0 };
+        setInterval(() => {
+            let now = new Date();
+            let timeStr = now.toLocaleTimeString('en-GB', {timeZone: 'Asia/Dhaka'});
+            document.getElementById('clock-bd').innerText = timeStr;
             
-            // লস ৩ এর বেশি হলে স্কিপ লজিক
-            if(streak <= -3 && totalMatch < 5) return { prediction: "SKIP", matches: totalMatch };
+            let sec = now.getSeconds();
+            document.getElementById('timer-sec').innerText = 60 - sec;
 
-            return {
-                prediction: (bMatch >= sMatch) ? "BIG" : "SMALL",
-                matches: totalMatch
-            };
+            // ৫৯ সেকেন্ডে লোডিং শুরু
+            if(sec === 59) {
+                showLoadingState();
+            }
+            
+            // ৬ সেকেন্ড পর সিগন্যাল দিবে (প্রফেশনাল ডিলে)
+            if(sec === 6) {
+                fetchMarketData();
+            }
+        }, 1000);
+
+        function showLoadingState() {
+            document.getElementById('signal-res').style.display = 'none';
+            document.getElementById('loading-anim').style.display = 'block';
+            document.getElementById('period-num').innerText = "ANALYZING...";
+            document.getElementById('period-num').style.color = "#0ff";
         }
 
-        function showSignal(a) {
-            let el = document.getElementById('signal-res');
-            document.getElementById('match-count').innerText = a.matches;
-            if(a.prediction === "BIG") { el.innerText = "BIG"; el.className="res-txt big"; }
-            else if(a.prediction === "SMALL") { el.innerText = "SMALL"; el.className="res-txt small"; }
-            else { el.innerText = "SKIP"; el.className="res-txt skip"; }
+        async function fetchMarketData() {
+            try {
+                let res = await fetch(API_URL + "?v=" + Date.now());
+                let json = await res.json();
+                let history = json.data.list; 
+                let nextIssue = (BigInt(history[0].issueNumber) + 1n).toString();
+
+                if(nextIssue !== lastId) {
+                    lastId = nextIssue;
+                    let last10 = history.slice(0, 10).map(item => parseInt(item.number) >= 5 ? "BIG" : "SMALL");
+                    
+                    let bigs = last10.filter(x => x === "BIG").length;
+                    let smalls = last10.filter(x => x === "SMALL").length;
+                    
+                    let prediction = (bigs >= smalls) ? "BIG" : "SMALL";
+                    if(last10[0] === last10[1] && last10[1] === last10[2]) prediction = (last10[0] === "BIG" ? "SMALL" : "BIG");
+
+                    displaySignal(prediction, nextIssue);
+                }
+            } catch(e) { console.log("Retrying..."); }
         }
 
-        function updateUI(s) {
-            let box = document.getElementById('streak-box');
-            if(s > 3) { box.innerText = "🔥 SUPER WIN "+s; box.style.color="#0f0"; }
-            else if(s > 0) { box.innerText = "WIN "+s; box.style.color="#0f0"; }
-            else if(s < 0) { box.innerText = "LOSS "+Math.abs(s); box.style.color="#f00"; }
+        function displaySignal(p, period) {
+            const txt = document.getElementById('signal-res');
+            const pTxt = document.getElementById('period-num');
+            const loader = document.getElementById('loading-anim');
+            
+            loader.style.display = 'none';
+            txt.style.display = 'block';
+            
+            txt.innerText = p;
+            pTxt.innerText = "PERIOD: " + period;
+            pTxt.style.color = "#00ffff";
+            
+            let color = (p === "BIG") ? "#0f0" : "#ff0";
+            txt.style.color = color;
+            txt.style.textShadow = `0 0 20px ${color}`;
         }
 
-        function toggleW() { let w = document.getElementById('signal-widget'); w.style.display = (w.style.display==='none')?'block':'none'; }
-
-        // Drag
+        // DRAG LOGIC
         document.querySelectorAll('.draggable').forEach(el => {
-            let isDown=false, x, y;
-            el.addEventListener('mousedown', e => { isDown=true; x=e.clientX-el.offsetLeft; y=e.clientY-el.offsetTop; });
-            document.addEventListener('mousemove', e => { if(isDown) { el.style.left=(e.clientX-x)+'px'; el.style.top=(e.clientY-y)+'px'; }});
-            document.addEventListener('mouseup', () => isDown=false);
-            el.addEventListener('touchstart', e => { x=e.touches[0].clientX-el.offsetLeft; y=e.touches[0].clientY-el.offsetTop; }, {passive:true});
-            el.addEventListener('touchmove', e => { e.preventDefault(); el.style.left=(e.touches[0].clientX-x)+'px'; el.style.top=(e.touches[0].clientY-y)+'px'; }, {passive:true});
+            let x, y;
+            el.ontouchstart = e => { x=e.touches[0].clientX-el.offsetLeft; y=e.touches[0].clientY-el.offsetTop; };
+            el.ontouchmove = e => { 
+                e.preventDefault();
+                el.style.left=(e.touches[0].clientX-x)+'px'; 
+                el.style.top=(e.touches[0].clientY-y)+'px'; 
+            };
         });
 
-        setInterval(loop, 3000);
+        fetchMarketData();
     </script>
 </body>
 </html>
