@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PINEX VIP MOD | 30S AUDIO PRO</title>
+    <style>
+        * { -webkit-tap-highlight-color: transparent; user-select: none; box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; font-family: 'Arial Black', sans-serif; }
+        
+        #game-frame { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 1; }
+        .draggable { position: absolute; z-index: 10000; touch-action: none; cursor: move; }
+
+        #main-skull {
+            top: 15%; left: 10px; width: 55px; height: 55px;
+            background: #111; border: 2.5px solid #0f0; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 15px #0f0; cursor: pointer; font-size: 28px;
+        }
+
+        #signal-widget {
+            top: 15%; right: 10px; width: 240px; 
+            background: rgba(0, 0, 0, 0.95); border: 2px solid #333;
+            border-radius: 20px; color: white; text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.9); backdrop-filter: blur(15px);
+            overflow: hidden;
+        }
+
+        .header-name { 
+            background: linear-gradient(180deg, #1a1a1a, #000);
+            padding: 10px; font-size: 18px; font-weight: 900; 
+            color: #0f0; letter-spacing: 1px; border-bottom: 2px solid #222;
+            text-shadow: 0 0 10px #0f0;
+        }
+        
+        .signal-container { 
+            position: relative; height: 135px; 
+            display: flex; flex-direction: column; 
+            align-items: center; justify-content: center;
+        }
+        
+        .mega-txt { 
+            font-size: 60px; font-weight: 900; line-height: 1; 
+            text-transform: uppercase; margin-bottom: 8px;
+            display: none; width: 100%;
+        }
+
+        .period-display {
+            font-size: 12px; color: #00ffff; font-family: monospace;
+            background: rgba(255,255,255,0.1); padding: 3px 12px;
+            border-radius: 50px; font-weight: bold;
+        }
+        
+        #loading-anim { 
+            width: 60px; height: 60px; 
+            border: 6px solid rgba(255, 255, 255, 0.1); 
+            border-top: 6px solid #0f0; 
+            border-radius: 50%; 
+            display: block; 
+            animation: spin-pro 0.8s linear infinite; 
+            margin-bottom: 10px;
+        }
+
+        .info-panel { 
+            display: flex; justify-content: space-between; 
+            background: #0a0a0a; padding: 10px 15px; 
+            border-top: 1px solid #333;
+        }
+        #timer-sec { color: #ff0; font-weight: bold; font-size: 16px; }
+        #clock-bd { color: #888; font-size: 13px; font-family: monospace; }
+
+        @keyframes spin-pro { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body onclick="startWelcome()">
+
+    <iframe src="https://hgzy.in/#/register?invitationCode=51226515900" id="game-frame"></iframe>
+
+    <div id="main-skull" class="draggable" onclick="toggleWidget()">💀</div>
+
+    <div id="signal-widget" class="draggable">
+        <div class="header-name">PINEX VIP MOD</div>
+        <div class="signal-container">
+            <div id="loading-anim"></div>
+            <div id="signal-res" class="mega-txt" style="color:#0f0;">READY</div>
+            <div id="period-num" class="period-display">ANALYZING...</div>
+        </div>
+        <div class="info-panel">
+            <div id="clock-bd">00:00:00</div>
+            <div>NEXT- <span id="timer-sec">30</span>s</div>
+        </div>
+    </div>
+
+    <script>
+        // --- তোমার GitHub লিঙ্কগুলো এখানে সরাসরি সেট করা হলো ---
+        const BASE_LINK = "https://github.com/mdmunnaislam12332132-ctrl/PINEX-MOD/raw/refs/heads/main/";
+        
+        let welcomePlayed = false;
+        let lastPrediction = null; 
+        let lastId = null;
+        
+        // সিরিয়াল অডিও মেইনটেইন করার জন্য ভেরিয়েবল
+        let winCount = 0;
+        let lossCount = 0;
+
+        // প্রথম ক্লিকে ওয়েলকাম বাজবে এবং অডিও আনলক হবে
+        function startWelcome() {
+            if(!welcomePlayed) {
+                new Audio(BASE_LINK + "wel.mp3").play().catch(e => console.log("Audio Enabled"));
+                welcomePlayed = true;
+            }
+        }
+
+        const API_URL = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json";
+
+        function toggleWidget() {
+            let w = document.getElementById('signal-widget');
+            w.style.display = (w.style.display === 'none') ? 'block' : 'none';
+        }
+
+        // স্মার্ট অডিও ফাংশন: সিরিয়াল অনুযায়ী w1-w7 বা l1-l7 বাজাবে
+        function playSmartAudio(status) {
+            let audioFile = "";
+            if(status === "WIN") {
+                lossCount = 0; // উইন হলে লস সিরিয়াল জিরো হবে
+                winCount = (winCount % 7) + 1; // ১ থেকে ৭ পর্যন্ত বাড়বে
+                audioFile = "w" + winCount + ".mp3";
+            } else {
+                winCount = 0; // লস হলে উইন সিরিয়াল জিরো হবে
+                lossCount = (lossCount % 7) + 1; // ১ থেকে ৭ পর্যন্ত বাড়বে
+                audioFile = "l" + lossCount + ".mp3";
+            }
+            let playNow = new Audio(BASE_LINK + audioFile);
+            playNow.play().catch(e => console.log("Play error: Click screen once"));
+        }
+
+        setInterval(() => {
+            let now = new Date();
+            document.getElementById('clock-bd').innerText = now.toLocaleTimeString('en-GB', {timeZone: 'Asia/Dhaka'});
+            let sec = now.getSeconds();
+            let remaining = (sec >= 30) ? 60 - sec : 30 - sec;
+            document.getElementById('timer-sec').innerText = remaining;
+
+            if(remaining === 1) {
+                document.getElementById('signal-res').style.display = 'none';
+                document.getElementById('loading-anim').style.display = 'block';
+                document.getElementById('period-num').innerText = "ANALYZING...";
+            }
+            
+            if(remaining === 28 || remaining === 58) fetchMarketData();
+        }, 1000);
+
+        async function fetchMarketData() {
+            try {
+                let res = await fetch(API_URL + "?v=" + Date.now());
+                let json = await res.json();
+                let history = json.data.list;
+                let currentResult = history[0];
+                let nextIssue = (BigInt(currentResult.issueNumber) + 1n).toString();
+
+                if(nextIssue !== lastId) {
+                    // রেজাল্ট আসার পর চেক: উইন না লস?
+                    if(lastPrediction) {
+                        let actual = (parseInt(currentResult.number) >= 5) ? "BIG" : "SMALL";
+                        if(actual === lastPrediction) {
+                            playSmartAudio("WIN"); 
+                        } else {
+                            playSmartAudio("LOSS");
+                        }
+                    }
+
+                    lastId = nextIssue;
+                    let last10 = history.slice(0, 10).map(item => parseInt(item.number) >= 5 ? "BIG" : "SMALL");
+                    
+                    let bigs = last10.filter(x => x === "BIG").length;
+                    let smalls = last10.filter(x => x === "SMALL").length;
+                    
+                    let prediction = (bigs >= smalls) ? "BIG" : "SMALL";
+                    if(last10[0] === last10[1] && last10[1] === last10[2]) prediction = (last10[0] === "BIG" ? "SMALL" : "BIG");
+
+                    lastPrediction = prediction;
+
+                    // সিগন্যাল দেখানোর টাইমিং
+                    setTimeout(() => {
+                        displaySignal(prediction, nextIssue);
+                    }, 6000);
+                }
+            } catch(e) { console.log("Retrying..."); }
+        }
+
+        function displaySignal(p, period) {
+            const txt = document.getElementById('signal-res');
+            const pTxt = document.getElementById('period-num');
+            const loader = document.getElementById('loading-anim');
+            
+            loader.style.display = 'none';
+            txt.style.display = 'block';
+            txt.innerText = p;
+            pTxt.innerText = "PERIOD: " + period;
+            
+            let color = (p === "BIG") ? "#0f0" : "#ff0";
+            txt.style.color = color;
+            txt.style.textShadow = `0 0 20px ${color}`;
+        }
+
+        document.querySelectorAll('.draggable').forEach(el => {
+            let x, y;
+            el.ontouchstart = e => { x=e.touches[0].clientX-el.offsetLeft; y=e.touches[0].clientY-el.offsetTop; };
+            el.ontouchmove = e => { 
+                e.preventDefault();
+                el.style.left=(e.touches[0].clientX-x)+'px'; 
+                el.style.top=(e.touches[0].clientY-y)+'px'; 
+            };
+        });
+
+        fetchMarketData();
+    </script>
+</body>
+</html>
