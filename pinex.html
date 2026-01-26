@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PINEX VIP MOD | 1M</title>
+    <style>
+        * { -webkit-tap-highlight-color: transparent; user-select: none; box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; font-family: 'Arial Black', sans-serif; }
+        
+        #start-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.98); z-index: 999999;
+            display: flex; justify-content: center; align-items: center;
+        }
+        #start-btn {
+            padding: 20px 40px; font-size: 22px; color: #00ffff; background: #111;
+            border: 2px solid #00ffff; border-radius: 10px; cursor: pointer;
+            box-shadow: 0 0 25px #00ffff; font-weight: bold; text-transform: uppercase;
+            animation: pulse 1.5s infinite;
+        }
+
+        #game-frame { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 1; }
+        .draggable { position: absolute; z-index: 10000; touch-action: none; cursor: move; }
+
+        #main-skull {
+            top: 15%; left: 10px; width: 55px; height: 55px;
+            background: #111; border: 2.5px solid #0f0; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 15px #0f0; cursor: pointer; font-size: 28px;
+        }
+
+        #signal-widget {
+            top: 15%; right: 10px; width: 240px; 
+            background: rgba(0, 0, 0, 0.95); border: 2px solid #333;
+            border-radius: 20px; color: white; text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.9); backdrop-filter: blur(15px);
+            overflow: hidden; display: none;
+        }
+
+        .header-name { background: linear-gradient(90deg, #000, #1a1a1a, #000); padding: 10px; font-size: 16px; color: #00ffff; border-bottom: 2px solid #222; text-shadow: 0 0 5px #00ffff; letter-spacing: 1px; }
+        .signal-container { position: relative; height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .mega-txt { font-size: 50px; font-weight: 900; display: none; width: 100%; margin-bottom: 5px; }
+        .period-display { font-size: 12px; color: #aaa; margin-bottom: 8px; }
+        
+        #path-box-container {
+            display: none; 
+            margin-top: 5px;
+            padding: 4px 12px;
+            background: linear-gradient(45deg, #222, #000);
+            border: 1px solid #00ffff;
+            border-radius: 5px;
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+        }
+        #path-label { font-size: 9px; color: #00ffff; margin-right: 5px; }
+        #pattern-id { font-size: 11px; color: #fff; font-family: monospace; font-weight: bold; }
+        
+        #loading-anim { width: 60px; height: 60px; border: 6px solid rgba(255,255,255,0.1); border-top: 6px solid #00ffff; border-radius: 50%; animation: spin-pro 0.8s linear infinite; }
+        .info-panel { display: flex; justify-content: space-between; background: #0a0a0a; padding: 10px 15px; border-top: 1px solid #333; }
+        #timer-sec { color: #ff0; font-weight: bold; font-size: 16px; }
+        #clock-bd { color: #888; font-size: 13px; font-family: monospace; }
+        
+        @keyframes spin-pro { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <div id="start-overlay">
+        <button id="start-btn" onclick="initHacking()">PINEX 1M STARTED</button>
+    </div>
+
+    <iframe src="https://tkclub2.com/#/register?invitationCode=42788189745" id="game-frame"></iframe>
+
+    <div id="main-skull" class="draggable" onclick="toggleWidget()">💀</div>
+
+    <div id="signal-widget" class="draggable">
+        <div class="header-name">PINEX VIP MOD</div>
+        <div class="signal-container">
+            <div id="loading-anim"></div>
+            <div id="signal-res" class="mega-txt">READY</div>
+            <div id="period-num" class="period-display">WAITING PY...</div>
+            
+            <div id="path-box-container">
+                <span id="path-label">PATH:</span>
+                <span id="pattern-id">--</span>
+            </div>
+        </div>
+        <div class="info-panel">
+            <div id="clock-bd">00:00:00</div>
+            <div>TIME: <span id="timer-sec">60</span>s</div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_LINK = "https://github.com/mdmunnaislam12332132-ctrl/PINEX-MOD/raw/refs/heads/main/";
+        
+        let lastDisplayedPeriod = null;
+        let winCount = 0;
+        let lossCount = 0;
+        let SERVER_URL = "";
+
+        // URL থেকে IP বের করার লজিক
+        function getQueryParam(param) {
+            let urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        function initHacking() {
+            // ১. চেক করা হচ্ছে URL এ IP আছে কিনা
+            let ip = getQueryParam('server');
+            
+            if(!ip) {
+                // যদি IP না থাকে, তাহলে ব্লক করে দিবে এবং এই মেসেজ দেখাবে
+                alert("⛔ ACCESS DENIED! ⛔\n\nআপনি আগে বট থেকে আইপি বাইন্ড করেন তারপর আইপি বাইন্ড করলে লিংকে প্রবেশ করতে পারবে।");
+                return; // এখান থেকেই ফাংশন বন্ধ, আর কাজ করবে না
+            }
+
+            // পোর্ট 8000 যুক্ত করা
+            SERVER_URL = `http://${ip}:8000/data`;
+
+            // সব ঠিক থাকলে গেম শুরু হবে
+            document.getElementById('start-overlay').style.display = 'none';
+            document.getElementById('signal-widget').style.display = 'block';
+            new Audio(BASE_LINK + "wel.mp3").play();
+            
+            // সার্ভার চেক শুরু
+            setInterval(checkServerData, 1000);
+        }
+
+        function toggleWidget() {
+            let w = document.getElementById('signal-widget');
+            w.style.display = (w.style.display === 'none') ? 'block' : 'none';
+        }
+
+        function playSmartAudio(status) {
+            let file = "";
+            if(status === "WIN") {
+                lossCount = 0;
+                winCount = (winCount % 7) + 1;
+                file = "w" + winCount + ".mp3";
+            } else if (status === "LOSS") {
+                winCount = 0;
+                lossCount = (lossCount % 7) + 1;
+                file = "l" + lossCount + ".mp3";
+            }
+            if(file) new Audio(BASE_LINK + file).play();
+        }
+
+        async function checkServerData() {
+            if(!SERVER_URL) return;
+
+            try {
+                let response = await fetch(SERVER_URL); 
+                if (!response.ok) return;
+                let data = await response.json();
+                
+                if (data.period !== lastDisplayedPeriod && data.period !== "Loading...") {
+                    
+                    if (lastDisplayedPeriod !== null && data.status !== "WAITING") {
+                        playSmartAudio(data.status);
+                    }
+
+                    lastDisplayedPeriod = data.period;
+                    
+                    document.getElementById('signal-res').style.display = 'none';
+                    document.getElementById('path-box-container').style.display = 'none'; 
+                    document.getElementById('loading-anim').style.display = 'block';
+                    document.getElementById('period-num').innerText = "CALCULATING...";
+
+                    setTimeout(() => {
+                        displaySignal(data.signal, data.period, data.pattern);
+                    }, 4000);
+                }
+
+            } catch (e) {
+                console.log("Connection Error: " + e);
+                // কানেকশন না পেলে ইউজারকে জানানো
+                document.getElementById('period-num').innerText = "Link Server...";
+            }
+        }
+
+        function displaySignal(signal, period, patternId) {
+            const txt = document.getElementById('signal-res');
+            const pTxt = document.getElementById('period-num');
+            const pId = document.getElementById('pattern-id');
+            const pBox = document.getElementById('path-box-container');
+            const loader = document.getElementById('loading-anim');
+            
+            loader.style.display = 'none';
+            txt.style.display = 'block';
+            
+            pTxt.innerText = "PERIOD: " + period;
+
+            if(signal === "SKIP" || signal === null) {
+                txt.innerText = "SKIP";
+                txt.style.color = "#888";
+                txt.style.textShadow = "none";
+                pBox.style.display = 'none';
+            } else {
+                txt.innerText = signal;
+                let color = (signal === "BIG") ? "#0f0" : "#ff0"; 
+                txt.style.color = color;
+                txt.style.textShadow = `0 0 20px ${color}`;
+                
+                pBox.style.display = 'inline-block';
+                pId.innerText = "#" + patternId;
+            }
+        }
+
+        setInterval(() => {
+            let now = new Date();
+            document.getElementById('clock-bd').innerText = now.toLocaleTimeString('en-GB', {timeZone: 'Asia/Dhaka'});
+            let sec = now.getSeconds();
+            let remaining = 60 - sec;
+            if(remaining === 60) remaining = 0;
+            document.getElementById('timer-sec').innerText = remaining;
+        }, 1000);
+
+        document.querySelectorAll('.draggable').forEach(el => {
+            let x, y;
+            el.ontouchstart = e => { x=e.touches[0].clientX-el.offsetLeft; y=e.touches[0].clientY-el.offsetTop; };
+            el.ontouchmove = e => { e.preventDefault(); el.style.left=(e.touches[0].clientX-x)+'px'; el.style.top=(e.touches[0].clientY-y)+'px'; };
+        });
+    </script>
+</body>
+</html>
