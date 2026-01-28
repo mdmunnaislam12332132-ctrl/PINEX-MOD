@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PINEX LIVE SIGNAL</title>
+    <style>
+        body { background: #000; color: #0f0; text-align: center; font-family: sans-serif; }
+        #signal-res { font-size: 150px; font-weight: bold; margin-top: 50px; }
+        #period-num { font-size: 40px; color: #0ff; }
+        #timer { font-size: 30px; color: #ff0; }
+    </style>
+</head>
+<body onload="updateSignal()">
+    <div id="period-num">PERIOD: --</div>
+    <div id="signal-res">WAITING</div>
+    <div id="timer">NEXT: --s</div>
+
+    <script>
+        async function updateSignal() {
+            setInterval(async () => {
+                try {
+                    // তোমার পিসির IP বা Localhost থেকে ডাটা নিবে
+                    let res = await fetch('http://localhost:8000/data');
+                    let data = await res.json();
+                    document.getElementById('signal-res').innerText = data.signal;
+                    document.getElementById('period-num').innerText = "PERIOD: " + data.period;
+                } catch (e) { console.log("Server connect mismatch"); }
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
