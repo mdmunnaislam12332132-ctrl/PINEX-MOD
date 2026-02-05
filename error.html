@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TK CLUB HACK - PINEX MOD</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            overflow: hidden;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 40px;
+            border: 2px solid #00ff41;
+            box-shadow: 0 0 20px #00ff41;
+            z-index: 10;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        h1 {
+            color: #00ff41;
+            font-size: 2.5rem;
+            margin: 0;
+            text-shadow: 0 0 10px #00ff41;
+        }
+
+        h2 {
+            color: #ff3e3e;
+            font-size: 1.5rem;
+            letter-spacing: 5px;
+            margin-bottom: 20px;
+        }
+
+        .status-text {
+            color: #00ff41;
+            font-size: 14px;
+            text-align: left;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .btn-container {
+            margin-top: 30px;
+        }
+
+        button {
+            background: #00ff41;
+            color: black;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: white;
+            box-shadow: 0 0 20px white;
+        }
+
+        .blink {
+            animation: blinker 1s linear infinite;
+        }
+
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="matrix"></canvas>
+
+    <div class="overlay">
+        <h1>TK CLUB HACK</h1>
+        <h2>PINEX MOD</h2>
+        
+        <div class="status-text">
+            > [SYSTEM]: INJECTING PROTOCOL...<br>
+            > [INFO]: BYPASSING SECURITY... OK<br>
+            > [STATUS]: <span class="blink" style="color: yellow;">ERROR DETECTED!</span><br>
+            > [ACTION]: MANUAL OVERRIDE REQUIRED...
+        </div>
+
+        <div class="btn-container">
+            <button onclick="window.location.href='https://pinex-mod.vercel.app/dragon.html'">TRY AGAIN NOW</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const chars = "120";
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+
+        for (let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
+
+        function draw() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = "#00ff41"; 
+            ctx.font = fontSize + "px monospace";
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 33);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
