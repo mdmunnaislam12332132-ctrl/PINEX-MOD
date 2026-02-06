@@ -14,26 +14,87 @@
         }
         body, html { margin: 0; padding: 0; height: 100%; background: #000; font-family: 'Arial Black', sans-serif; overflow: hidden; }
         
+        /* গেম ফ্রেম (ব্যাকগ্রাউন্ড) */
         #game-frame { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 1; }
         
-        .draggable { position: absolute; z-index: 1000; touch-action: none; cursor: move; }
+        /* ড্র্যাগেবল ক্লাস */
+        .draggable { position: absolute; z-index: 9999; touch-action: none; cursor: move; }
         
+        /* মেইন আইকন */
         #main-icon { 
             top: 15%; left: 10px; width: 60px; height: 60px; 
             background: #000; border: 2px solid #0f0; border-radius: 50%; 
-            display: flex; justify-content: center; align-items: center; 
+            display: none; 
+            justify-content: center; align-items: center; 
             box-shadow: 0 0 15px #0f0; font-size: 30px; cursor: pointer;
         }
 
+        /* সিগন্যাল উইজেট */
         #widget { 
             top: 15%; right: 10px; width: 240px; 
-            background: rgba(0,0,0,0.92); 
+            background: rgba(0,0,0,0.95); 
             border: 2px solid #0f0; border-radius: 15px; 
             color: white; text-align: center; display: none; 
-            backdrop-filter: blur(10px); 
-            box-shadow: 0 0 25px rgba(0,255,0,0.3);
+            backdrop-filter: blur(5px); 
+            box-shadow: 0 0 20px rgba(0,255,0,0.2);
         }
 
+        /* --- লগইন বক্স এনিমেশন --- */
+        @keyframes glowingBox {
+            0% { box-shadow: 0 0 5px #0f0, 0 0 10px #0f0; border-color: #0f0; }
+            50% { box-shadow: 0 0 20px #0f0, 0 0 40px #0f0; border-color: #fff; }
+            100% { box-shadow: 0 0 5px #0f0, 0 0 10px #0f0; border-color: #0f0; }
+        }
+
+        /* পাসওয়ার্ড বক্স (ছোট এবং গ্লোয়িং) */
+        #login-box {
+            top: 60%; left: 50%; transform: translate(-50%, -50%);
+            width: 220px; /* ছোট করা হয়েছে */
+            background: #000;
+            border: 2px solid #0f0;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            display: block;
+            animation: glowingBox 1.5s infinite alternate; /* আলো জ্বলার এনিমেশন */
+        }
+
+        #pass-input {
+            width: 100%;
+            padding: 8px;
+            background: #111;
+            border: 1px solid #0f0;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        #pass-input::placeholder { color: #555; }
+
+        #login-btn {
+            padding: 8px 20px;
+            font-size: 14px;
+            color: #000;
+            font-weight: 900;
+            background: #0f0;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 10px #0f0;
+            width: 100%;
+        }
+        
+        .error-msg {
+            color: #ff3333;
+            font-size: 11px;
+            margin-top: 5px;
+            min-height: 15px;
+        }
+
+        /* উইজেট টেক্সট স্টাইল */
         .header-box {
             background: linear-gradient(180deg, #111, #000);
             padding: 10px; border-radius: 13px 13px 0 0;
@@ -46,17 +107,15 @@
             color: #ff0; text-shadow: 0 0 15px #ff0; 
             margin: 15px 0; transition: all 0.3s ease;
         }
-
-        .scanning-txt {
-            font-size: 20px !important; 
-            color: #ffff00;
-            animation: blink 0.5s infinite;
+        
+        /* লোডিং এনিমেশন */
+        @keyframes blinkText { 0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; } }
+        .loading-text {
+            font-size: 25px; color: #ffff00;
+            animation: blinkText 0.5s infinite;
         }
 
-        #period {
-            font-size: 15px; color: #fff; 
-            margin-top: 5px; font-weight: bold;
-        }
+        #period { font-size: 15px; color: #fff; margin-top: 5px; font-weight: bold; }
 
         .timer { 
             font-size: 14px; color: #0ff; 
@@ -65,152 +124,58 @@
             display: inline-block; margin-bottom: 15px; 
         }
 
-        .status-box { font-size: 11px; color: #888; margin-top: 5px; }
+        .status-box { font-size: 11px; color: #888; margin-top: 5px; display: none; } /* স্ট্যাটাস হাইড রাখা হয়েছে */
 
-        #start-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.98); z-index: 9999; 
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center; 
-        }
-        #start-btn { 
-            padding: 18px 50px; font-size: 22px; color: #000; font-weight: bold;
-            background: #0f0; border: none; 
-            border-radius: 50px; cursor: pointer; 
-            box-shadow: 0 0 40px #0f0; 
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
 
-    <div id="start-overlay">
-        <div style="color: #0f0; margin-bottom: 20px; font-size: 22px; font-weight: bold;">PINEX VIP AI SERVER</div>
-        <button id="start-btn" onclick="startMod()">START SYSTEM</button>
-        <div style="color: #555; margin-top: 15px; font-size: 12px;">Sound will be activated automatically</div>
+    <iframe src="https://yes-minor-derived-containers.trycloudflare.com" id="game-frame"></iframe>
+    
+    <div id="login-box" class="draggable">
+        <div style="color: #0f0; margin-bottom: 10px; font-size: 16px; font-weight: bold;">SYSTEM LOGIN</div>
+        <input type="password" id="pass-input" placeholder="Password">
+        <button id="login-btn" onclick="checkPassword()">ENTER</button>
+        <div id="error-text" class="error-msg"></div>
     </div>
-    
-    <iframe src="https://combine-devon-attraction-optimize.trycloudflare.com" id="game-frame"></iframe>
-    
+
     <div id="main-icon" class="draggable" onclick="toggleWidget()">💀</div>
 
     <div id="widget" class="draggable">
         <div class="header-box">PINEX VIP SYSTEM v3.0</div>
-        <div id="status" class="status-box">SYSTEM READY</div>
         <div id="period">WAITING...</div>
         <div id="signal" class="signal-res">WAIT</div>
         <div class="timer">TIME: <span id="sec">--</span>s</div>
     </div>
 
     <script>
-        const ORIGINAL_API = "https://api880.inpay88.net/api/webapi/GetNoaverageEmerdList";
+        const FIREBASE_URL = "https://number-a159b-default-rtdb.firebaseio.com/wingo.json";
         const AUDIO_BASE = "https://github.com/mdmunnaislam12332132-ctrl/PINEX-MOD/raw/refs/heads/main/";
         
-        // আপনার এবং আমার দেওয়া শক্তিশালী প্যাটার্ন ডাটাবেস
-        const PATTERN_DB = {
-            "1": {"p": "BBBB", "r": "B"}, "2": {"p": "SBSS", "r": "B"}, "3": {"p": "BBSS", "r": "B"},
-            "4": {"p": "SBSS", "r": "B"}, "5": {"p": "BSSB", "r": "B"}, "6": {"p": "BBSB", "r": "B"},
-            "7": {"p": "BSBB", "r": "B"}, "8": {"p": "BSSB", "r": "B"}, "9": {"p": "BBSB", "r": "B"},
-            "10": {"p": "BBBS", "r": "S"}, "11": {"p": "BSBS", "r": "B"}, "12": {"p": "BBBS", "r": "S"},
-            "13": {"p": "BSBB", "r": "S"}, "14": {"p": "BBBB", "r": "S"}, "15": {"p": "SBBS", "r": "S"},
-            "16": {"p": "SSBS", "r": "B"}, "17": {"p": "BSSB", "r": "S"}, "18": {"p": "SBSB", "r": "B"},
-            "19": {"p": "SBSS", "r": "B"}, "20": {"p": "BBSB", "r": "S"}, "21": {"p": "SSSS", "r": "S"},
-            "22": {"p": "SBBB", "r": "B"}, "23": {"p": "SBSS", "r": "S"}, "24": {"p": "BBSS", "r": "B"},
-            "25": {"p": "SSBB", "r": "B"}, "26": {"p": "SBBS", "r": "B"}, "27": {"p": "SSSS", "r": "S"},
-            "28": {"p": "BSSS", "r": "B"}, "29": {"p": "BBSS", "r": "B"}, "30": {"p": "SSBB", "r": "S"},
-            "31": {"p": "BSBS", "r": "B"}, "32": {"p": "SBBS", "r": "B"}, "33": {"p": "SSSS", "r": "S"},
-            "34": {"p": "BBBB", "r": "S"}, "35": {"p": "BSSS", "r": "B"}, "36": {"p": "SBBB", "r": "S"},
-            "37": {"p": "SBSS", "r": "S"}, "38": {"p": "SBBB", "r": "S"}, "39": {"p": "SSBB", "r": "S"},
-            "40": {"p": "BSBS", "r": "S"}, "41": {"p": "SSBB", "r": "B"}, "42": {"p": "SBBB", "r": "S"},
-            "43": {"p": "BSBB", "r": "S"}, "44": {"p": "BBSS", "r": "S"}, "45": {"p": "BBBS", "r": "S"},
-            "46": {"p": "SBBB", "r": "S"}, "47": {"p": "SSSB", "r": "B"}, "48": {"p": "BSSS", "r": "S"},
-            "49": {"p": "SSSS", "r": "S"}, "50": {"p": "BBBS", "r": "B"}, "51": {"p": "BBBS", "r": "S"},
-            "52": {"p": "BBSS", "r": "S"}, "53": {"p": "BSSS", "r": "B"}, "54": {"p": "BBBB", "r": "S"},
-            "55": {"p": "SBSS", "r": "S"}, "56": {"p": "SSSS", "r": "B"}, "57": {"p": "SBBB", "r": "B"},
-            "58": {"p": "BBBB", "r": "S"}, "59": {"p": "BSSB", "r": "S"}, "60": {"p": "SBBS", "r": "B"},
-            "61": {"p": "SSBS", "r": "B"}, "62": {"p": "SSBB", "r": "B"}, "63": {"p": "SBBS", "r": "S"},
-            "64": {"p": "SSSS", "r": "B"}, "65": {"p": "SBBS", "r": "B"}, "66": {"p": "SSBS", "r": "B"},
-            "67": {"p": "BSSS", "r": "B"}, "68": {"p": "SSBS", "r": "S"}, "69": {"p": "SSBB", "r": "B"},
-            "70": {"p": "SSBB", "r": "S"}, "71": {"p": "SSBS", "r": "S"}, "72": {"p": "SSSB", "r": "S"},
-            "73": {"p": "SBBB", "r": "S"}, "74": {"p": "BBSS", "r": "B"}, "75": {"p": "SSBS", "r": "B"},
-            "76": {"p": "BSSB", "r": "S"}, "77": {"p": "BSBS", "r": "B"}, "78": {"p": "SBSS", "r": "S"},
-            "79": {"p": "BSSB", "r": "B"}, "80": {"p": "BBSS", "r": "S"}, "81": {"p": "SBSS", "r": "B"},
-            "82": {"p": "BSBS", "r": "S"}, "83": {"p": "SBBS", "r": "B"}, "84": {"p": "BSBB", "r": "S"},
-            "85": {"p": "SBBS", "r": "B"}, "86": {"p": "BSSB", "r": "B"}, "87": {"p": "BBBS", "r": "B"},
-            "88": {"p": "BBBS", "r": "S"}, "89": {"p": "SBBB", "r": "S"}, "90": {"p": "BSSS", "r": "S"},
-            "91": {"p": "BSBB", "r": "B"}, "92": {"p": "BBBS", "r": "S"}, "93": {"p": "BSBB", "r": "S"},
-            "94": {"p": "SSBB", "r": "S"}, "95": {"p": "SBSS", "r": "S"}, "96": {"p": "SSBS", "r": "B"},
-            "97": {"p": "BBBB", "r": "B"}, "98": {"p": "SSBB", "r": "B"}, "99": {"p": "SBBB", "r": "S"},
-            "100": {"p": "SBBS", "r": "B"}, "101": {"p": "SSSBB", "r": "S"}, "102": {"p": "SSSS", "r": "B"},
-            "103": {"p": "BBSS", "r": "B"}, "104": {"p": "SSSSSSSS", "r": "B"}, "105": {"p": "SBB", "r": "S"},
-            "106": {"p": "SSSSBB", "r": "S"}, "107": {"p": "SSBBB", "r": "S"}, "108": {"p": "SSSS", "r": "B"},
-            "109": {"p": "BBBSSS", "r": "B"}, "110": {"p": "BSBB", "r": "S"}, "111": {"p": "SBBBSS", "r": "B"},
-            "112": {"p": "SSSBBB", "r": "S"}, "113": {"p": "BSSBB", "r": "S"}, "114": {"p": "SBBSBBSSSS", "r": "B"},
-            "115": {"p": "BBBSB", "r": "S"}, "116": {"p": "BBSBBBSSSS", "r": "B"}, "117": {"p": "SBSBSSSSS", "r": "B"},
-            "118": {"p": "BBSS", "r": "B"}, "119": {"p": "SSSB", "r": "S"}, "120": {"p": "SBBBBBBSS", "r": "B"},
-            "121": {"p": "BSBB", "r": "S"}, "122": {"p": "BBSB", "r": "B"}, "123": {"p": "BBBBS", "r": "S"},
-            "124": {"p": "BSS", "r": "B"}, "125": {"p": "SBBB", "r": "S"}, "126": {"p": "BSBB", "r": "S"},
-            "127": {"p": "SSBSSSSSS", "r": "B"}, "128": {"p": "SBBSS", "r": "B"}, "129": {"p": "SSBBSS", "r": "B"},
-            "130": {"p": "BBBBSBBSSSS", "r": "B"}, "131": {"p": "BBBSSS", "r": "B"}, "132": {"p": "SS", "r": "S"},
-            "133": {"p": "BBSSBB", "r": "S"}, "134": {"p": "SBSS", "r": "B"}, "135": {"p": "BSSSS", "r": "B"},
-            "136": {"p": "SBB", "r": "S"}, "137": {"p": "BSBB", "r": "S"}, "138": {"p": "BBSB", "r": "B"},
-            "139": {"p": "SBSBB", "r": "S"}, "140": {"p": "SSB", "r": "S"}, "141": {"p": "SBSSBB", "r": "S"},
-            "142": {"p": "SBS", "r": "S"}, "143": {"p": "SBSBB", "r": "S"}, "144": {"p": "BSB", "r": "B"},
-            "145": {"p": "SBBBS", "r": "S"}, "146": {"p": "BBS", "r": "S"}, "147": {"p": "BSS", "r": "B"},
-            "148": {"p": "SBSSB", "r": "B"}, "149": {"p": "SSBBBB", "r": "S"}, "150": {"p": "SB", "r": "S"},
-            "151": {"p": "SBBS", "r": "B"}, "152": {"p": "SBBB", "r": "S"}, "153": {"p": "BBBS", "r": "S"},
-            "154": {"p": "SSSB", "r": "B"}, "155": {"p": "SBBB", "r": "B"}, "156": {"p": "SBBS", "r": "S"},
-            "157": {"p": "BBBB", "r": "S"}, "158": {"p": "SSBS", "r": "S"}, "159": {"p": "SBSB", "r": "B"},
-            "160": {"p": "SBSB", "r": "S"}, "161": {"p": "SBSB", "r": "B"}, "162": {"p": "SBBS", "r": "B"},
-            "163": {"p": "BSBB", "r": "B"}, "164": {"p": "BSBS", "r": "S"}, "165": {"p": "SBBB", "r": "B"},
-            "166": {"p": "SSBS", "r": "B"}, "167": {"p": "BSSB", "r": "S"}, "168": {"p": "BBBS", "r": "S"},
-            "169": {"p": "SBSB", "r": "B"}, "170": {"p": "SSSS", "r": "S"}, "171": {"p": "BSBB", "r": "S"},
-            "172": {"p": "BBSB", "r": "B"}, "173": {"p": "SBBB", "r": "S"}, "174": {"p": "SBBB", "r": "S"},
-            "175": {"p": "SBSS", "r": "B"}, "176": {"p": "SSSB", "r": "S"}, "177": {"p": "SBBB", "r": "B"},
-            "178": {"p": "BSBB", "r": "B"}, "179": {"p": "SSBS", "r": "B"}, "180": {"p": "BSBB", "r": "S"},
-            "181": {"p": "BBBS", "r": "S"}, "182": {"p": "BBSS", "r": "S"}, "183": {"p": "BBSB", "r": "S"},
-            "184": {"p": "SBBBB", "r": "S"}, "185": {"p": "BBS", "r": "B"}, "186": {"p": "BSS", "r": "B"},
-            "187": {"p": "BBBBS", "r": "B"}, "188": {"p": "SSBS", "r": "S"}, "189": {"p": "SBBB", "r": "B"},
-            "190": {"p": "SBBS", "r": "S"}, "191": {"p": "BSBS", "r": "S"}, "192": {"p": "SBBS", "r": "B"},
-            "193": {"p": "SSSB", "r": "B"}, "194": {"p": "BBSS", "r": "S"}, "195": {"p": "BBBS", "r": "B"},
-            "196": {"p": "SSBS", "r": "B"}, "197": {"p": "BSSB", "r": "S"}, "198": {"p": "BSBS", "r": "S"},
-            "199": {"p": "BBBS", "r": "B"}, "200": {"p": "BBBS", "r": "B"}, "201": {"p": "SBBB", "r": "B"},
-            "202": {"p": "SSBS", "r": "B"}, "203": {"p": "SSSB", "r": "S"}, "204": {"p": "SBSS", "r": "B"},
-            "205": {"p": "SSBB", "r": "B"}, "206": {"p": "BBSB", "r": "S"}, "207": {"p": "SBSS", "r": "S"},
-            "208": {"p": "BBBB", "r": "S"}, "209": {"p": "BBSS", "r": "B"}, "210": {"p": "SBSS", "r": "S"},
-            "211": {"p": "BBSB", "r": "S"}, "212": {"p": "SSBB", "r": "B"}, "213": {"p": "BSSS", "r": "B"},
-            "214": {"p": "BBSB", "r": "S"}, "215": {"p": "SBSB", "r": "B"}, "216": {"p": "SBSS", "r": "S"},
-            "217": {"p": "BBBB", "r": "S"}, "218": {"p": "BSSB", "r": "S"}, "219": {"p": "BSSS", "r": "B"},
-            "301": {"p": "BBBBBB", "r": "B"}, "302": {"p": "SSSSSS", "r": "S"}, 
-            "303": {"p": "BSBSBS", "r": "B"}, "304": {"p": "SBSBSB", "r": "S"},
-            "305": {"p": "BSSBSS", "r": "B"}, "306": {"p": "SBBSBB", "r": "S"},
-            "307": {"p": "BBSSBB", "r": "S"}, "308": {"p": "SSBBSS", "r": "B"},
-            "309": {"p": "BBBSBBBS", "r": "B"}, "310": {"p": "SSSBSSSB", "r": "S"},
-            // Extra powerful patterns
-            "401": {"p": "BBSBBS", "r": "B"}, "402": {"p": "SSBSSB", "r": "S"},
-            "403": {"p": "BSBSS", "r": "B"}, "404": {"p": "SBSBB", "r": "S"}
-        };
-
-        let lastRunningPeriod = null; 
-        let lastPrediction = null; 
-        let winCount = 0; 
-        let lossCount = 0;
+        let lastPeriod = null; 
+        let lastResultStatus = null;
         let isStarted = false;
+
+        function checkPassword() {
+            let pass = document.getElementById('pass-input').value;
+            let errorText = document.getElementById('error-text');
+
+            if (pass === "PINEX99") {
+                document.getElementById('login-box').style.display = 'none';
+                document.getElementById('main-icon').style.display = 'flex';
+                document.getElementById('widget').style.display = 'block';
+                startMod();
+            } else {
+                errorText.innerText = "ACCESS DENIED ❌";
+                document.getElementById('pass-input').value = "";
+                if(navigator.vibrate) navigator.vibrate(200);
+            }
+        }
 
         function startMod() {
             isStarted = true;
-            // Welcome sound play
             playSound("wel.mp3");
-
-            let overlay = document.getElementById('start-overlay');
-            overlay.style.opacity = '0';
-            setTimeout(() => { overlay.style.display = 'none'; }, 500);
-
-            document.getElementById('widget').style.display = 'block';
-            update();
+            setInterval(fetchFirebaseData, 1000);
         }
 
         function toggleWidget() {
@@ -218,7 +183,6 @@
             w.style.display = (w.style.display === 'none') ? 'block' : 'none';
         }
 
-        // সাউন্ড সিস্টেম ফিক্সড
         function playSound(filename) {
             try {
                 let audio = new Audio(AUDIO_BASE + filename);
@@ -226,130 +190,106 @@
             } catch(e) { console.log(e); }
         }
 
-        async function update() {
+        function playWinSound() {
+            let num = Math.floor(Math.random() * 7) + 1; 
+            playSound("w" + num + ".mp3");
+        }
+        
+        function playLossSound() {
+            let num = Math.floor(Math.random() * 7) + 1;
+            playSound("l" + num + ".mp3");
+        }
+
+        async function fetchFirebaseData() {
             if(!isStarted) return;
             try {
-                let response = await fetch(ORIGINAL_API, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-                    body: JSON.stringify({pageSize: 10, pageNo: 1, typeId: 1})
-                });
+                let response = await fetch(FIREBASE_URL + "?t=" + new Date().getTime());
                 let data = await response.json();
-                processData(data.data.list);
-            } catch(e) {
-                simulateData();
-            }
+                if (!data) return;
+                updateUI(data);
+            } catch(e) { console.log("Sync Error"); }
         }
 
-        function processData(list) {
-            let latestResultItem = list[0]; 
-            let latestIssueNum = BigInt(latestResultItem.issueNumber);
-            let resultNumber = parseInt(latestResultItem.number);
-            let currentRunningIssue = (latestIssueNum + 1n).toString();
-
-            if (currentRunningIssue !== lastRunningPeriod) {
-                if (lastRunningPeriod && lastPrediction && lastPrediction !== "SKIP") {
-                    checkResult(resultNumber);
-                }
-                lastRunningPeriod = currentRunningIssue;
-                document.getElementById('period').innerText = "PERIOD: " + currentRunningIssue;
-                startScanning(list);
-            }
-        }
-
-        function checkResult(realNum) {
-            let realResult = (realNum >= 5) ? "BIG" : "SMALL";
-            if (realResult === lastPrediction) {
-                winCount = (winCount % 7) + 1;
-                playSound("w" + winCount + ".mp3"); 
-            } else {
-                lossCount = (lossCount % 7) + 1;
-                playSound("l" + lossCount + ".mp3");
-            }
-        }
-
-        function startScanning(list) {
+        function updateUI(data) {
+            let periodEl = document.getElementById('period');
             let signalEl = document.getElementById('signal');
-            let statusEl = document.getElementById('status');
 
-            signalEl.innerText = "SCANNING...";
-            signalEl.className = "signal-res scanning-txt"; 
-            statusEl.innerText = "ANALYZING PATTERNS...";
+            // --- পিরিয়ড এবং লোডিং লজিক ---
+            if (data.period !== lastPeriod) {
+                lastPeriod = data.period;
+                periodEl.innerText = "PERIOD: " + data.period;
 
-            setTimeout(() => {
-                let trend = list.slice(0, 10).map(i => parseInt(i.number) >= 5 ? "B" : "S").reverse().join('');
-                let finalSignal = "SKIP";
+                // 1. প্রথমে লোডিং দেখাবে
+                signalEl.className = "loading-text";
+                signalEl.innerText = "ANALYZING...";
+                signalEl.style.color = "#ffff00"; // হলুদ রং লোডিং এর সময়
+                signalEl.style.textShadow = "none";
 
-                // Check long patterns first for better accuracy
-                let sortedPatterns = Object.values(PATTERN_DB).sort((a, b) => b.p.length - a.p.length);
-                
-                for (let patternObj of sortedPatterns) {
-                    if (trend.endsWith(patternObj.p)) {
-                        finalSignal = (patternObj.r === "B") ? "BIG" : "SMALL";
-                        break;
+                // 2. ৫.৫ সেকেন্ড পর রেজাল্ট দেখাবে
+                setTimeout(() => {
+                    signalEl.className = "signal-res";
+                    signalEl.innerText = data.prediction;
+
+                    if (data.prediction === "BIG") {
+                        signalEl.style.color = "#00ff09";
+                        signalEl.style.textShadow = "0 0 25px #00ff00";
+                    } else if (data.prediction === "SMALL") {
+                        signalEl.style.color = "#00ccff";
+                        signalEl.style.textShadow = "0 0 25px #00ccff";
+                    } else {
+                        signalEl.style.color = "#ff3333";
                     }
+                }, 5500); // 5500 মিলিসেকেন্ড = ৫.৫ সেকেন্ড ডিলে
+            }
+
+            // --- রেজাল্ট লজিক (শুধুমাত্র অডিও) ---
+            if (data.result && data.result !== "WAITING" && data.result !== lastResultStatus) {
+                lastResultStatus = data.result;
+
+                if (data.result === "WIN") {
+                    playWinSound();
+                    // কোনো ভিজ্যুয়াল টেক্সট চেঞ্জ নেই, শুধু সাউন্ড
+                } else if (data.result === "LOSS") {
+                    playLossSound();
+                    // কোনো ভিজ্যুয়াল টেক্সট চেঞ্জ নেই, শুধু সাউন্ড
                 }
-
-                lastPrediction = finalSignal;
-                signalEl.className = "signal-res";
-                signalEl.innerText = finalSignal;
-
-                if (finalSignal === "BIG") {
-                    signalEl.style.color = "#00ff00";
-                    signalEl.style.textShadow = "0 0 25px #00ff00";
-                } else if (finalSignal === "SMALL") {
-                    signalEl.style.color = "#00ccff";
-                    signalEl.style.textShadow = "0 0 25px #00ccff";
-                } else {
-                    signalEl.style.color = "#ff3333";
-                }
-                statusEl.innerText = "SIGNAL GENERATED";
-            }, 3000);
-        }
-
-        function simulateData() {
-            let now = new Date();
-            let totalMin = now.getHours() * 60 + now.getMinutes();
-            let dateStr = now.getFullYear().toString() + ("0" + (now.getMonth() + 1)).slice(-2) + ("0" + now.getDate()).slice(-2);
-            let nextIssue = dateStr + "01" + (10000 + totalMin).toString().slice(1);
-
-            if (nextIssue !== lastRunningPeriod) {
-                if(lastPrediction && lastPrediction !== "SKIP") {
-                    checkResult(Math.floor(Math.random() * 10));
-                }
-                lastRunningPeriod = nextIssue;
-                document.getElementById('period').innerText = "PERIOD: " + nextIssue;
-                let mockList = [];
-                for(let i=0; i<10; i++) mockList.push({number: Math.floor(Math.random()*10)});
-                startScanning(mockList);
             }
         }
 
+        // টাইমার
         setInterval(() => {
             let d = new Date();
             let remain = 60 - d.getSeconds();
             document.getElementById('sec').innerText = (remain < 10 ? "0" : "") + remain;
-            if (d.getSeconds() === 1) update();
         }, 1000);
 
-        // Draggable script
+        // Draggable Function
         document.querySelectorAll('.draggable').forEach(el => {
             let x = 0, y = 0, isDown = false;
             const start = (e) => {
+                if(e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
                 isDown = true;
-                x = (e.clientX || e.touches[0].clientX) - el.offsetLeft;
-                y = (e.clientY || e.touches[0].clientY) - el.offsetTop;
+                let clientX = e.clientX || e.touches[0].clientX;
+                let clientY = e.clientY || e.touches[0].clientY;
+                x = clientX - el.offsetLeft;
+                y = clientY - el.offsetTop;
             };
             const move = (e) => {
                 if (!isDown) return;
-                let cx = e.clientX || e.touches[0].clientX;
-                let cy = e.clientY || e.touches[0].clientY;
-                el.style.left = (cx - x) + 'px';
-                el.style.top = (cy - y) + 'px';
+                e.preventDefault();
+                let clientX = e.clientX || e.touches[0].clientX;
+                let clientY = e.clientY || e.touches[0].clientY;
+                el.style.left = (clientX - x) + 'px';
+                el.style.top = (clientY - y) + 'px';
+                el.style.transform = "translate(0,0)"; // Fix for transform conflict
             };
-            el.addEventListener('mousedown', start); el.addEventListener('touchstart', start);
-            document.addEventListener('mousemove', move); document.addEventListener('touchmove', move);
-            document.addEventListener('mouseup', () => isDown = false); document.addEventListener('touchend', () => isDown = false);
+            const end = () => { isDown = false; };
+            el.addEventListener('mousedown', start);
+            el.addEventListener('touchstart', start, {passive: false});
+            document.addEventListener('mousemove', move);
+            document.addEventListener('touchmove', move, {passive: false});
+            document.addEventListener('mouseup', end);
+            document.addEventListener('touchend', end);
         });
     </script>
 </body>
