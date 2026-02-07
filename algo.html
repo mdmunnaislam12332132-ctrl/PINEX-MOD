@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PINEX VIP MOD PRO</title>
+    <style>
+        * { 
+            box-sizing: border-box; 
+            user-select: none; 
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; font-family: 'Arial Black', sans-serif; overflow: hidden; }
+        
+        /* গেম ফ্রেম (ব্যাকগ্রাউন্ড) */
+        #game-frame { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 1; }
+        
+        /* ড্র্যাগেবল ক্লাস */
+        .draggable { position: absolute; z-index: 9999; touch-action: none; cursor: move; }
+        
+        /* মেইন আইকন */
+        #main-icon { 
+            top: 15%; left: 10px; width: 60px; height: 60px; 
+            background: #000; border: 2px solid #0f0; border-radius: 50%; 
+            display: none; 
+            justify-content: center; align-items: center; 
+            box-shadow: 0 0 15px #0f0; font-size: 30px; cursor: pointer;
+        }
+
+        /* সিগন্যাল উইজেট */
+        #widget { 
+            top: 15%; right: 10px; width: 240px; 
+            background: rgba(0,0,0,0.95); 
+            border: 2px solid #0f0; border-radius: 15px; 
+            color: white; text-align: center; display: none; 
+            backdrop-filter: blur(5px); 
+            box-shadow: 0 0 20px rgba(0,255,0,0.2);
+        }
+
+        /* --- লগইন বক্স এনিমেশন --- */
+        @keyframes glowingBox {
+            0% { box-shadow: 0 0 5px #0f0, 0 0 10px #0f0; border-color: #0f0; }
+            50% { box-shadow: 0 0 20px #0f0, 0 0 40px #0f0; border-color: #fff; }
+            100% { box-shadow: 0 0 5px #0f0, 0 0 10px #0f0; border-color: #0f0; }
+        }
+
+        /* পাসওয়ার্ড বক্স (ছোট এবং গ্লোয়িং) */
+        #login-box {
+            top: 60%; left: 50%; transform: translate(-50%, -50%);
+            width: 220px; /* ছোট করা হয়েছে */
+            background: #000;
+            border: 2px solid #0f0;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            display: block;
+            animation: glowingBox 1.5s infinite alternate; /* আলো জ্বলার এনিমেশন */
+        }
+
+        #pass-input {
+            width: 100%;
+            padding: 8px;
+            background: #111;
+            border: 1px solid #0f0;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        #pass-input::placeholder { color: #555; }
+
+        #login-btn {
+            padding: 8px 20px;
+            font-size: 14px;
+            color: #000;
+            font-weight: 900;
+            background: #0f0;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 10px #0f0;
+            width: 100%;
+        }
+        
+        .error-msg {
+            color: #ff3333;
+            font-size: 11px;
+            margin-top: 5px;
+            min-height: 15px;
+        }
+
+        /* উইজেট টেক্সট স্টাইল */
+        .header-box {
+            background: linear-gradient(180deg, #111, #000);
+            padding: 10px; border-radius: 13px 13px 0 0;
+            border-bottom: 1px solid #0f0;
+            color: #0f0; font-size: 14px; letter-spacing: 1px;
+        }
+
+        .signal-res { 
+            font-size: 40px; font-weight: 900; 
+            color: #ff0; text-shadow: 0 0 15px #ff0; 
+            margin: 15px 0; transition: all 0.3s ease;
+        }
+        
+        /* লোডিং এনিমেশন */
+        @keyframes blinkText { 0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; } }
+        .loading-text {
+            font-size: 25px; color: #ffff00;
+            animation: blinkText 0.5s infinite;
+        }
+
+        #period { font-size: 15px; color: #fff; margin-top: 5px; font-weight: bold; }
+
+        .timer { 
+            font-size: 14px; color: #0ff; 
+            background: rgba(255,255,255,0.1); 
+            padding: 5px 15px; border-radius: 50px; 
+            display: inline-block; margin-bottom: 15px; 
+        }
+
+        .status-box { font-size: 11px; color: #888; margin-top: 5px; display: none; } /* স্ট্যাটাস হাইড রাখা হয়েছে */
+
+    </style>
+</head>
+<body>
+
+    <iframe src="https://peaceful-champions-lending-appreciate.trycloudflare.com" id="game-frame"></iframe>
+    
+    <div id="login-box" class="draggable">
+        <div style="color: #0f0; margin-bottom: 10px; font-size: 16px; font-weight: bold;">SYSTEM LOGIN</div>
+        <input type="password" id="pass-input" placeholder="Password">
+        <button id="login-btn" onclick="checkPassword()">ENTER</button>
+        <div id="error-text" class="error-msg"></div>
+    </div>
+
+    <div id="main-icon" class="draggable" onclick="toggleWidget()">💀</div>
+
+    <div id="widget" class="draggable">
+        <div class="header-box">PINEX VIP SYSTEM v3.0</div>
+        <div id="period">WAITING...</div>
+        <div id="signal" class="signal-res">WAIT</div>
+        <div class="timer">TIME: <span id="sec">--</span>s</div>
+    </div>
+
+    <script>
+        const FIREBASE_URL = "https://number-a159b-default-rtdb.firebaseio.com/wingo.json";
+        const AUDIO_BASE = "https://github.com/mdmunnaislam12332132-ctrl/PINEX-MOD/raw/refs/heads/main/";
+        
+        let lastPeriod = null; 
+        let lastResultStatus = null;
+        let isStarted = false;
+
+        function checkPassword() {
+            let pass = document.getElementById('pass-input').value;
+            let errorText = document.getElementById('error-text');
+
+            if (pass === "PINEX99") {
+                document.getElementById('login-box').style.display = 'none';
+                document.getElementById('main-icon').style.display = 'flex';
+                document.getElementById('widget').style.display = 'block';
+                startMod();
+            } else {
+                errorText.innerText = "ACCESS DENIED ❌";
+                document.getElementById('pass-input').value = "";
+                if(navigator.vibrate) navigator.vibrate(200);
+            }
+        }
+
+        function startMod() {
+            isStarted = true;
+            playSound("wel.mp3");
+            setInterval(fetchFirebaseData, 1000);
+        }
+
+        function toggleWidget() {
+            let w = document.getElementById('widget');
+            w.style.display = (w.style.display === 'none') ? 'block' : 'none';
+        }
+
+        function playSound(filename) {
+            try {
+                let audio = new Audio(AUDIO_BASE + filename);
+                audio.play().catch(e => console.log("Sound error: ", e));
+            } catch(e) { console.log(e); }
+        }
+
+        function playWinSound() {
+            let num = Math.floor(Math.random() * 7) + 1; 
+            playSound("w" + num + ".mp3");
+        }
+        
+        function playLossSound() {
+            let num = Math.floor(Math.random() * 7) + 1;
+            playSound("l" + num + ".mp3");
+        }
+
+        async function fetchFirebaseData() {
+            if(!isStarted) return;
+            try {
+                let response = await fetch(FIREBASE_URL + "?t=" + new Date().getTime());
+                let data = await response.json();
+                if (!data) return;
+                updateUI(data);
+            } catch(e) { console.log("Sync Error"); }
+        }
+
+        function updateUI(data) {
+            let periodEl = document.getElementById('period');
+            let signalEl = document.getElementById('signal');
+
+            // --- পিরিয়ড এবং লোডিং লজিক ---
+            if (data.period !== lastPeriod) {
+                lastPeriod = data.period;
+                periodEl.innerText = "PERIOD: " + data.period;
+
+                // 1. প্রথমে লোডিং দেখাবে
+                signalEl.className = "loading-text";
+                signalEl.innerText = "ANALYZING...";
+                signalEl.style.color = "#ffff00"; // হলুদ রং লোডিং এর সময়
+                signalEl.style.textShadow = "none";
+
+                // 2. ৫.৫ সেকেন্ড পর রেজাল্ট দেখাবে
+                setTimeout(() => {
+                    signalEl.className = "signal-res";
+                    signalEl.innerText = data.prediction;
+
+                    if (data.prediction === "BIG") {
+                        signalEl.style.color = "#00ff09";
+                        signalEl.style.textShadow = "0 0 25px #00ff00";
+                    } else if (data.prediction === "SMALL") {
+                        signalEl.style.color = "#00ccff";
+                        signalEl.style.textShadow = "0 0 25px #00ccff";
+                    } else {
+                        signalEl.style.color = "#ff3333";
+                    }
+                }, 5500); // 5500 মিলিসেকেন্ড = ৫.৫ সেকেন্ড ডিলে
+            }
+
+            // --- রেজাল্ট লজিক (শুধুমাত্র অডিও) ---
+            if (data.result && data.result !== "WAITING" && data.result !== lastResultStatus) {
+                lastResultStatus = data.result;
+
+                if (data.result === "WIN") {
+                    playWinSound();
+                    // কোনো ভিজ্যুয়াল টেক্সট চেঞ্জ নেই, শুধু সাউন্ড
+                } else if (data.result === "LOSS") {
+                    playLossSound();
+                    // কোনো ভিজ্যুয়াল টেক্সট চেঞ্জ নেই, শুধু সাউন্ড
+                }
+            }
+        }
+
+        // টাইমার
+        setInterval(() => {
+            let d = new Date();
+            let remain = 60 - d.getSeconds();
+            document.getElementById('sec').innerText = (remain < 10 ? "0" : "") + remain;
+        }, 1000);
+
+        // Draggable Function
+        document.querySelectorAll('.draggable').forEach(el => {
+            let x = 0, y = 0, isDown = false;
+            const start = (e) => {
+                if(e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
+                isDown = true;
+                let clientX = e.clientX || e.touches[0].clientX;
+                let clientY = e.clientY || e.touches[0].clientY;
+                x = clientX - el.offsetLeft;
+                y = clientY - el.offsetTop;
+            };
+            const move = (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                let clientX = e.clientX || e.touches[0].clientX;
+                let clientY = e.clientY || e.touches[0].clientY;
+                el.style.left = (clientX - x) + 'px';
+                el.style.top = (clientY - y) + 'px';
+                el.style.transform = "translate(0,0)"; // Fix for transform conflict
+            };
+            const end = () => { isDown = false; };
+            el.addEventListener('mousedown', start);
+            el.addEventListener('touchstart', start, {passive: false});
+            document.addEventListener('mousemove', move);
+            document.addEventListener('touchmove', move, {passive: false});
+            document.addEventListener('mouseup', end);
+            document.addEventListener('touchend', end);
+        });
+    </script>
+</body>
+</html>
